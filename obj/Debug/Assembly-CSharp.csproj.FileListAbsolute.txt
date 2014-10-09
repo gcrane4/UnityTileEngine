@@ -1,0 +1,10 @@
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\Assembly-CSharp.dll
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\Assembly-CSharp.pdb
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\UnityEditor.dll
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\UnityEngine.dll
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\Mono.Cecil.dll
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\nunit.framework.dll
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\Unity.DataContract.dll
+C:\Users\House\Documents\Unity_Sidescroller\Temp\bin\Debug\ICSharpCode.NRefactory.dll
+C:\Users\House\Documents\Unity_Sidescroller\obj\Debug\Assembly-CSharp.dll
+C:\Users\House\Documents\Unity_Sidescroller\obj\Debug\Assembly-CSharp.pdb

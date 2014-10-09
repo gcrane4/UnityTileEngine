@@ -1,0 +1,16 @@
+﻿<Properties>
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\script\ClickHandler.cs">
+    <Files>
+      <File FileName="Assets\script\CameraTouchInput.cs" Line="32" Column="3" />
+      <File FileName="Assets\script\TileMap.cs" Line="54" Column="32" />
+      <File FileName="Assets\script\ClickHandler.cs" Line="25" Column="24" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore>
+      <Breakpoint file="C:\Users\YourMomsBox\Documents\Unity_Sidescroller\Assets\script\ClickHandler.cs" line="19" />
+    </BreakpointStore>
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
