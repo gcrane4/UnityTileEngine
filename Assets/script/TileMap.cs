@@ -1,15 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+//TODO: REFACTOR!!! very much needed, approaching end of basic iteration
 public class TileMap : MonoBehaviour {
+	private bool writeOn = false;
 
-	private bool oneTouch = false;
+	private float guiScaleX;
+	private float guiScaleY;
+
+	private int tileSelect = 0;
 
     /** the tile atlas, a texture containing one or more tile images evenly spaced **/
     public Texture2D atlas;
 
 	private int[,] map;
 	private GameObject[,] tileSprites;
+
+	// TODO: dynamic GUI bounds for layered input
+	private static Rect[] guiBounds = new Rect[] { new Rect(0f, .9004525f, .7175141f, .0995475f),
+												   new Rect(0f, .4751131f, .240113f, .5248869f)};	
 
     // TODO: account for tile atlas padding
 
@@ -20,24 +29,18 @@ public class TileMap : MonoBehaviour {
     public int tileHeight;
 
 	/** return the width of the tile atlas in tiles **/
-	public int AtlasWidth {
-		get 
-		{
-			return (atlas.width / tileWidth);
-		}
+	public int AtlasWidth() {
+		return (atlas.width / tileWidth);
 	}
 	
 	/** return the height of the tile atlas in tiles **/
-	public int AtlasHeight {
-		get
-		{
-			return (atlas.height / tileHeight);
-		}
+	public int AtlasHeight() {
+		return (atlas.height / tileHeight);
 	}
 
 	public Rect getTileRect(int tilecode) 
 	{
-		return new Rect ((tilecode % AtlasWidth) * tileWidth, ((AtlasHeight - (tilecode / AtlasWidth)) * tileHeight) - tileHeight, tileWidth, tileHeight);
+		return new Rect ((tilecode % AtlasWidth()) * tileWidth, ((AtlasHeight() - (tilecode / AtlasWidth())) * tileHeight) - tileHeight, tileWidth, tileHeight);
 	}
 
     public GameObject DrawTile(int x, int y, int tilecode)
@@ -51,7 +54,7 @@ public class TileMap : MonoBehaviour {
 			tileSprites[y, x].renderer.enabled = true;
 		}
 
-		if (tilecode >= (AtlasWidth * AtlasHeight)) {
+		if (tilecode >= (AtlasWidth() * AtlasHeight())) {
 			throw new System.IndexOutOfRangeException("Tile code index is out of range of tile atlas.");
 		}
 	
@@ -79,16 +82,16 @@ public class TileMap : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		map = new int[AtlasHeight, AtlasWidth];
+		map = new int[AtlasHeight(), AtlasWidth()];
 		// TODO: on a mostly empty map, don't use so much memory space
 		// although these ARE pointers per C#
-		tileSprites = new GameObject[AtlasHeight, AtlasWidth];
+		tileSprites = new GameObject[AtlasHeight(), AtlasWidth()];
 
 		// print all atlas tiles in order
 		int tc = 0;
-		for (int y = 0; y < AtlasHeight; y++)
+		for (int y = 0; y < AtlasHeight(); y++)
 		{
-			for (int x = 0; x < AtlasWidth; x++) 
+			for (int x = 0; x < AtlasWidth(); x++) 
 			{
 				map[y, x] = tc++;
 			}
@@ -98,7 +101,7 @@ public class TileMap : MonoBehaviour {
         atlas.filterMode = FilterMode.Point;
 
 		// render all tiles in map
-		DrawRegion (0, 0, AtlasWidth, AtlasHeight);
+		DrawRegion (0, 0, AtlasWidth(), AtlasHeight());
 	}
 
 	void DrawRegion(int x, int y, int width, int height) 
@@ -112,67 +115,97 @@ public class TileMap : MonoBehaviour {
 		}
 	}
 
-	void AddTile (int x, int y, int tilecode) 
-	{
-		if (tilecode < (AtlasWidth * AtlasHeight)) {
-			map [y, x] = tilecode;
-		} else {
-			map [y, x] = -1;
-		}
-
-		DrawTile (x, y, map [y, x]);
-	}
-
-	void RemoveTile (int x, int y)
-	{
-		// update map data
-		map [y, x] = -1;
-
-		// update tile sprite
-		DrawTile (x, y, -1);
-	}
-
 	void Update() {
-		if (Input.touchCount == 0) {
-			oneTouch = false;
+		if (Screen.orientation == ScreenOrientation.Landscape) {
+			guiScaleX = (Screen.width / 12.0f) / 100;
+			guiScaleY = (Screen.height / 6.0f) / 100;
+		} 
+
+		if (Screen.orientation == ScreenOrientation.Portrait) {
+			guiScaleX = (Screen.width / 6.0f) / 100;
+			guiScaleY = (Screen.height / 12.0f) / 100;
 		}
 
-		if (Input.GetMouseButtonDown (0) || Input.touchCount == 1) {
+		// handle Input mouse clicks
+		if (Input.GetMouseButtonDown (0)) {
+			bool guiHit = false;
 
-			Ray ray = new Ray();
+			// check for a collision with the GUI layer, if clicked outside of GUI rect
+			Vector3 mouseViewPosition = Camera.main.ScreenToViewportPoint (Input.mousePosition);
 
-			if (Input.GetMouseButtonDown(0)) {
-				ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			} else if (Input.touchCount == 1 && !oneTouch) { 
-				ray = Camera.main.ScreenPointToRay(Input.touches[0].position);
-				oneTouch = true;
-			} else return;
-			
-			Debug.Log ("Got a click at: " + ray);
-			
-			if (Physics2D.Raycast(ray.origin, ray.direction)) {
-				int tileX = (int)(ray.origin.x * 100f) / 32;
-				int tileY = (int)(ray.origin.y * 100f) / 32;
-				int tilecode = (tileY * 32) + tileX;
+			foreach (Rect bound in guiBounds) {
+				// check to see if GUI was clicked first
+				if (bound.Contains(mouseViewPosition)) {
+					Debug.Log("got GUI click at: (" + mouseViewPosition.x +
+					          ", " + mouseViewPosition.y + ")");
+					guiHit = true;
+					break;
+				}
+			}
+
+			// after all bounds are checked, check for input collision on TileMap
+			if (!guiHit) {
+				Vector3 mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+
+				// cast a 2D ray to check for collision with TileMap objects
+				RaycastHit2D rayHit = Physics2D.Raycast(
+					mouseWorldPosition, Vector2.zero);
 				
-				Debug.Log ("The mouse hit a tile: (" +
-				           tileX + ", " + tileY + "): " + tilecode);
+				// show click when an object is clicked
+				if (rayHit.collider != null) {
+					Debug.Log ("object clicked: " + rayHit.collider.name);
+					Debug.Log ("mouse at: (" + mouseWorldPosition.x + 
+					           ", " + mouseWorldPosition.y + ")");
 
-				// check tilemap boundaries
-				if (tileX < map.GetLength(1) && tileY < map.GetLength(0)) {
-					// loop through all tilecodes
-					if (map[tileY, tileX] == (AtlasWidth * AtlasHeight) - 1) {
-						// loop to first tile code at last tilecode
-						map[tileY, tileX] = 0;
-					} else {
-						// otherwise iterate ahead by one
-						map[tileY, tileX] = map[tileY, tileX] + 1;
-					}
+					int tileX = ((int)(mouseWorldPosition.x * 100)) / 32;
+					int tileY = ((int)(mouseWorldPosition.y * 100)) / 32;
 
-					// create / render new sprite image
-					DrawTile(tileX, tileY, map[tileY, tileX]);
+					Debug.Log ("tile coord: (" + tileX + ", " + tileY + ")");
+
+					// update tile to selected tile on map at mouse position
+					DrawTile(tileX, tileY, tileSelect);
 				}
 			}
 		}
+
 	}
+
+
+	// TODO: scall small text up on smaller screens
+	void OnGUI() {
+		// refresh tile texture each frame
+		// WARN: this may be expensive for large tiles
+		Texture2D tileTex = new Texture2D(tileWidth, tileHeight);
+		Rect tileRect = getTileRect(tileSelect);
+		tileTex.SetPixels(
+			atlas.GetPixels((int)tileRect.x, (int)tileRect.y,
+		                (int)tileRect.width, (int)tileRect.height));
+		tileTex.Apply ();
+		GUI.DrawTexture(new Rect(10f * guiScaleX, 200f * guiScaleY, 128f * guiScaleX, 128f * guiScaleX), tileTex);
+
+		// toggle write mode with toggle switch
+		writeOn = GUI.Toggle (new Rect (10f * guiScaleX, 130f * guiScaleY, 200f * guiScaleX, 60f * guiScaleY), writeOn, "Write Mode");
+
+		// increase and loop around atlas tiles
+		if (GUI.Button (new Rect (230f * guiScaleX, 20f * guiScaleY, 200f * guiScaleX, 100f * guiScaleY), "Next Tile")) {
+			// at the last tile, go back to tile 0
+			if (tileSelect == (AtlasWidth() * AtlasHeight()) - 1) {
+				tileSelect = 0;
+			} else {
+				tileSelect++;
+			}
+		}
+
+		// decrease and loop around atlas tiles
+		if (GUI.Button (new Rect (10f * guiScaleX, 20f * guiScaleY, 200f * guiScaleX, 100f * guiScaleY), "Prev Tile")) {
+			// at the first tile, go to the last tile in atlas
+			if (tileSelect == 0) {
+				tileSelect = (AtlasWidth() * AtlasHeight()) - 1;
+			} else {
+				tileSelect--;
+			}
+		} 
+	}
+
+	// TODO: implement property drawer for selection grid / tile palette
 }
