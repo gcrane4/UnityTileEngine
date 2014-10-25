@@ -11,8 +11,8 @@ public class TileMapPalette : EditorWindow {
 	private Texture2D[] texList;
 	private bool drawNewTileset;
 	private int oldTileX;
-	private GUIStyle warningStyle;
-	private GUIStyle buttonStyle;
+	private static GUIStyle warningStyle;
+	private static GUIStyle buttonStyle;
 
 	[MenuItem ("TileMap/Atlas Palette")]
 	public static void ShowWindow() {
@@ -67,7 +67,7 @@ public class TileMapPalette : EditorWindow {
 					int k = 0;
 					
 					for (int j = 0; j < myTex2D.height; j += tileSizeY) {
-						for (int i = 0; i < myTex2D.width; i += tileSizeX) {
+						for (int i = 0; i < position.width; i += tileSizeX) {
 							texList[k] = new Texture2D(tileSizeX, tileSizeY);
 							texList[k].filterMode = FilterMode.Point;
 							texList[k].SetPixels(myTex2D.GetPixels(i, j, tileSizeX, tileSizeY));
@@ -82,8 +82,9 @@ public class TileMapPalette : EditorWindow {
 				GUILayout.EndHorizontal();
 			}			
 
+			// expand the selection grid as the screen is resized
 			if (texList != null) {
-				selected = GUILayout.SelectionGrid (selected, texList, oldTileX, buttonStyle);
+				selected = GUILayout.SelectionGrid (selected, texList, (int)(position.width / tileSizeX), buttonStyle);
 			}
 		}
 	}
