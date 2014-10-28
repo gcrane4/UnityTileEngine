@@ -7,10 +7,12 @@ public class TileMapPalette : EditorWindow {
 	int tileSizeX;
 	int tileSizeY;
 	int selected;
-
+	int lastSelected;
+	Color[] lastTile;
+	Vector2 scrollPos = new Vector2 ();
+	
 	private Texture2D[] texList;
-	private bool drawNewTileset;
-	private int oldTileX;
+	private static GUIStyle blankStyle;
 	private static GUIStyle warningStyle;
 	private static GUIStyle buttonStyle;
 
@@ -33,6 +35,11 @@ public class TileMapPalette : EditorWindow {
 			tileSizeY = EditorGUILayout.IntField (tileSizeY);
 		GUILayout.EndHorizontal ();	
 
+		// only define blankStyle once
+		if (blankStyle == null) {
+			blankStyle = new GUIStyle();
+		}
+
 		// only define warningStyle once
 		if (warningStyle == null) {
 			warningStyle = new GUIStyle();
@@ -44,6 +51,7 @@ public class TileMapPalette : EditorWindow {
 			buttonStyle = new GUIStyle();
 			buttonStyle.stretchHeight = false;
 			buttonStyle.stretchWidth = false;
+			buttonStyle.padding = new RectOffset(2, 2, 2, 2);
 		}
 
 		if (myTex2D != null) {
@@ -53,38 +61,50 @@ public class TileMapPalette : EditorWindow {
 				int numTilesY = myTex2D.height / tileSizeY;
 				int numTiles = numTilesX * numTilesY;
 
-				GUILayout.BeginHorizontal();
+				GUILayout.BeginHorizontal ();
 				if (numTiles > 4096) {
-					GUILayout.Label("Divide into " + numTiles + " tiles?", warningStyle);
+					GUILayout.Label ("Divide into " + numTiles + " tiles?", warningStyle);
 				}
 
 				if (numTiles <= 4096) {
-					GUILayout.Label("Divide into " + numTiles + " tiles?");
+					GUILayout.Label ("Divide into " + numTiles + " tiles?");
 				}
 
-				if (GUILayout.Button("Apply")) {
+				if (GUILayout.Button ("Apply")) {
+					// resize elements
+					// reset focused background size
+					buttonStyle.onNormal.background = new Texture2D(tileSizeX, tileSizeY);
+					Color[] backColors = new Color[tileSizeX * tileSizeY];
+					for (int i = 0; i < backColors.Length; i++) {
+						backColors[i] = Color.black;
+					}
+
+					buttonStyle.onNormal.background.SetPixels(backColors);
+					buttonStyle.onNormal.background.Apply();
+
 					texList = new Texture2D[(myTex2D.width / tileSizeX) * (myTex2D.height / tileSizeY)];
 					int k = 0;
-					
-					for (int j = 0; j < myTex2D.height; j += tileSizeY) {
-						for (int i = 0; i < position.width; i += tileSizeX) {
-							texList[k] = new Texture2D(tileSizeX, tileSizeY);
-							texList[k].filterMode = FilterMode.Point;
-							texList[k].SetPixels(myTex2D.GetPixels(i, j, tileSizeX, tileSizeY));
-							texList[k].Apply();
+
+					// flip array orientation by reading y-axis from top to bottom
+					for (int j = myTex2D.height - tileSizeY; j >= 0; j -= tileSizeY) {
+						// continue reading x-axis left to right
+						for (int i = 0; i < myTex2D.width; i += tileSizeX) {
+							texList [k] = new Texture2D (tileSizeX, tileSizeY);
+							texList [k].filterMode = FilterMode.Point;
+							texList [k].SetPixels (myTex2D.GetPixels (i, j, tileSizeX, tileSizeY));
+							texList [k].Apply ();
 							k++;
 						}
 					}
-
-					// refresh tile count for drawing SelectionGrid
-					oldTileX = numTilesX;
 				}
-				GUILayout.EndHorizontal();
+				GUILayout.EndHorizontal ();
 			}			
 
 			// expand the selection grid as the screen is resized
 			if (texList != null) {
-				selected = GUILayout.SelectionGrid (selected, texList, (int)(position.width / tileSizeX), buttonStyle);
+				scrollPos = GUILayout.BeginScrollView (scrollPos, blankStyle);
+				selected = GUILayout.SelectionGrid (selected, texList, (myTex2D.width / tileSizeX), buttonStyle);
+				GUILayout.EndScrollView ();
 			}
 		}
 	}
