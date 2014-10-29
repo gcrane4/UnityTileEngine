@@ -206,6 +206,4 @@ public class TileMap : MonoBehaviour {
 			}
 		} 
 	}
-
-	// TODO: implement property drawer for selection grid / tile palette
 }
