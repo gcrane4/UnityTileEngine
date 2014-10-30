@@ -7,8 +7,8 @@ public class TileMapPalette : EditorWindow {
 	int tileSizeX;
 	int tileSizeY;
 	int selected;
+	int rowLength;
 	int lastSelected;
-	Color[] lastTile;
 	Vector2 scrollPos = new Vector2 ();
 	
 	private Texture2D[] texList;
@@ -79,6 +79,8 @@ public class TileMapPalette : EditorWindow {
 						backColors[i] = Color.black;
 					}
 
+					rowLength = (myTex2D.width / tileSizeX) - 1;
+
 					buttonStyle.onNormal.background.SetPixels(backColors);
 					buttonStyle.onNormal.background.Apply();
 
@@ -88,7 +90,7 @@ public class TileMapPalette : EditorWindow {
 					// flip array orientation by reading y-axis from top to bottom
 					for (int j = myTex2D.height - tileSizeY; j >= 0; j -= tileSizeY) {
 						// continue reading x-axis left to right
-						for (int i = 0; i < myTex2D.width; i += tileSizeX) {
+						for (int i = 0; i < myTex2D.width - tileSizeX; i += tileSizeX) {
 							texList [k] = new Texture2D (tileSizeX, tileSizeY);
 							texList [k].filterMode = FilterMode.Point;
 							texList [k].SetPixels (myTex2D.GetPixels (i, j, tileSizeX, tileSizeY));
@@ -100,10 +102,11 @@ public class TileMapPalette : EditorWindow {
 				GUILayout.EndHorizontal ();
 			}			
 
-			// expand the selection grid as the screen is resized
-			if (texList != null) {
+			// draw a selection grid when bounds are appropriate
+			// and a texture list has been created
+			if (texList != null && rowLength > 0) {
 				scrollPos = GUILayout.BeginScrollView (scrollPos, blankStyle);
-				selected = GUILayout.SelectionGrid (selected, texList, (myTex2D.width / tileSizeX), buttonStyle);
+				selected = GUILayout.SelectionGrid (selected, texList, rowLength, buttonStyle);
 				GUILayout.EndScrollView ();
 			}
 		}

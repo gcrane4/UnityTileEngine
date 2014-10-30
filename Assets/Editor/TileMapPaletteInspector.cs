@@ -6,6 +6,8 @@ using System.Collections;
 public class TileMapPaletteInspector : Editor {
 	int selected;
 	int lastSelected;
+	int rowLength;
+
 	Color[] lastTile;
 	Vector2 scrollPos = new Vector2 ();
 
@@ -75,7 +77,21 @@ public class TileMapPaletteInspector : Editor {
 				}
 				
 				if (GUILayout.Button ("Apply")) {
-					// resize elements
+					// cleanup unused textures
+					if (texList != null) {
+						foreach (Texture2D tex in texList) 
+						{
+							DestroyImmediate(tex);
+						}
+						
+						texList = null;
+					}
+					
+					// destroy focused background texture if it exists
+					if (buttonStyle.onNormal.background != null) {
+						DestroyImmediate(buttonStyle.onNormal.background); 
+					}
+
 					// reset focused background size
 					buttonStyle.onNormal.background = 
 						new Texture2D(targetTilemap.tileWidth, targetTilemap.tileHeight);
@@ -85,18 +101,23 @@ public class TileMapPaletteInspector : Editor {
 					}
 					
 					buttonStyle.onNormal.background.SetPixels(backColors);
+					buttonStyle.onNormal.background.hideFlags = HideFlags.DontSave;
 					buttonStyle.onNormal.background.Apply();
-					
+
+					// create a list that contains all tiles in the atlas 
+					// divided into target tile sizes
 					texList = new Texture2D[(targetTilemap.atlas.width / targetTilemap.tileWidth) * (targetTilemap.atlas.height / targetTilemap.tileHeight)];
+					rowLength = (targetTilemap.atlas.width / targetTilemap.tileWidth) - 1;
 					int k = 0;
 					
 					// flip array orientation by reading y-axis from top to bottom
 					for (int j = targetTilemap.atlas.height - targetTilemap.tileHeight; j >= 0; j -= targetTilemap.tileHeight) {
 						// continue reading x-axis left to right
-						for (int i = 0; i < targetTilemap.atlas.width; i += targetTilemap.tileWidth) {
+						for (int i = 0; i < targetTilemap.atlas.width - targetTilemap.tileWidth; i += targetTilemap.tileWidth) {
 							texList [k] = new Texture2D (targetTilemap.tileWidth, targetTilemap.tileHeight);
 							texList [k].filterMode = FilterMode.Point;
 							texList [k].SetPixels (targetTilemap.atlas.GetPixels (i, j, targetTilemap.tileWidth, targetTilemap.tileHeight));
+							texList [k].hideFlags = HideFlags.DontSave;
 							texList [k].Apply ();
 							k++;
 						}
@@ -104,18 +125,20 @@ public class TileMapPaletteInspector : Editor {
 				}
 				GUILayout.EndHorizontal ();
 			}			
-			
-			// expand the selection grid as the screen is resized
-			if (texList != null) {
+
+			if (texList != null && rowLength > 0) {
 				scrollPos = GUILayout.BeginScrollView (scrollPos, blankStyle);
-				selected = GUILayout.SelectionGrid (selected, texList, (targetTilemap.atlas.width / targetTilemap.tileWidth), buttonStyle);
+				selected = GUILayout.SelectionGrid (selected, texList, rowLength, buttonStyle);
 				GUILayout.EndScrollView ();
 			}
 		}
 
+		// set tilemap data as dirty if the GUI is changed
+		// Unity will then save any changes and clear the dirty flag
 		if (GUI.changed)
 			EditorUtility.SetDirty (targetTilemap);
 	}
+
 	void OnSceneGUI () {
 		int controlID = GUIUtility.GetControlID (FocusType.Passive);
 		switch (Event.current.GetTypeForControl (controlID)) {
