@@ -1,15 +1,18 @@
 ﻿<Properties>
-  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\Editor\TileMapPaletteInspector.cs">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\script\TileMap.cs">
     <Files>
-      <File FileName="Assets\Editor\TileMapPaletteInspector.cs" Line="134" Column="62" />
-      <File FileName="Assets\script\TileMap.cs" Line="1" Column="1" />
-      <File FileName="Assets\script\TileMapPalette.cs" Line="1" Column="1" />
+      <File FileName="Assets\script\TileMap.cs" Line="4" Column="39" />
+      <File FileName="Assets\Editor\TileMapPaletteInspector.cs" Line="23" Column="3" />
+      <File FileName="Assets\script\CameraTouchInput.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="C:\Users\Public\Documents\Unity Projects\Sidescroller\Assets\script\TileMap.cs" line="65" />
+      <Breakpoint file="C:\Users\Public\Documents\Unity Projects\Sidescroller\Assets\script\TileMap.cs" line="62" />
+      <Breakpoint file="C:\Users\Public\Documents\Unity Projects\Sidescroller\Assets\Editor\TileMapPaletteInspector.cs" line="92" />
+      <Breakpoint file="C:\Users\Public\Documents\Unity Projects\Sidescroller\Assets\Editor\TileMapPaletteInspector.cs" line="99" />
+      <Breakpoint file="C:\Users\Public\Documents\Unity Projects\Sidescroller\Assets\Editor\TileMapPaletteInspector.cs" line="121" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

@@ -6,8 +6,6 @@ using System.Collections;
 public class TileMapPaletteInspector : Editor {
 	int selected;
 	int lastSelected;
-	int rowLength;
-
 	int tileWidth;
 	int tileHeight;
 
@@ -18,11 +16,6 @@ public class TileMapPaletteInspector : Editor {
 	private static GUIStyle blankStyle;
 	private static GUIStyle warningStyle;
 	private static GUIStyle buttonStyle;
-	
-	[MenuItem ("TileMap/Atlas Palette")]
-	public static void ShowWindow() {
-		EditorWindow.GetWindow (typeof(TileMapPalette));
-	}
 	
 	public override void OnInspectorGUI() {
 		// get tilemap as target object
@@ -128,9 +121,11 @@ public class TileMapPaletteInspector : Editor {
 				GUILayout.EndHorizontal ();
 			}			
 
+			// calculate rowlength based on tilemap object
+			int rowLength = (targetTilemap.atlas.width / targetTilemap.tileWidth);
+
 			if (texList != null && rowLength > 0) {
 				scrollPos = GUILayout.BeginScrollView (scrollPos, blankStyle);
-				rowLength = (targetTilemap.atlas.width / targetTilemap.tileWidth);
 				selected = GUILayout.SelectionGrid (selected, texList, rowLength, buttonStyle);
 				GUILayout.EndScrollView ();
 			}
@@ -155,27 +150,24 @@ public class TileMapPaletteInspector : Editor {
 				// manipulate current event's mouse position in world
 				Vector2 mousePosition = Event.current.mousePosition;
 
-				Debug.Log("Mouse: " + mousePosition);
-
+				// translate screen click to world point
 				Vector2 worldPoint = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(mousePosition);
 
-				Debug.Log("World: " + worldPoint);
-
+				// get the camera position for offset
 				Vector2 cameraPosition = SceneView.currentDrawingSceneView.camera.transform.position;
 
+				// shift the mouse click point using camera position
 				Vector2 shiftPoint = new Vector3(worldPoint.x,
                 	-(worldPoint.y - (2 * cameraPosition.y)));
 
-				Debug.Log("Shift: " + shiftPoint);
-
+				// get x and y in tiles
 				int tileX = (int)((shiftPoint.x * 100) / targetTilemap.tileWidth);
 				int tileY = (int)((shiftPoint.y * 100) / targetTilemap.tileHeight);
 
-				if (tileX > -1 && tileX < targetTilemap.AtlasWidth() &&
-				    tileY > -1 && tileY < targetTilemap.AtlasHeight()) {
-					Debug.Log("Drawing Tile: (" + tileX + ", " + tileY + "): " + selected);
-					GameObject newTile = targetTilemap.DrawTile(tileX, tileY, selected);
-					newTile.transform.parent = targetTilemap.transform;
+				// use TileMap method to draw tile to TileMap
+				if (targetTilemap.DrawTile(tileX, tileY, selected) == null) {
+					// switch control back to the Editor if clicking outside of TileMap
+					GUIUtility.hotControl = 0;
 				}
 			}
 		}
