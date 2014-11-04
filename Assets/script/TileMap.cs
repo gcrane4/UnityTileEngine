@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-//TODO: REFACTOR!!! very much needed, approaching end of basic iteration
 public class TileMap : MonoBehaviour {
 	private bool writeOn = false;
 
@@ -45,38 +44,48 @@ public class TileMap : MonoBehaviour {
 
     public GameObject DrawTile(int x, int y, int tilecode)
     {
-		if (tilecode == -1) 
-		{
-			// disable this tile
-			tileSprites[y, x].renderer.enabled = false;
-			return tileSprites[y, x];
-		} else if (tileSprites[y, x] != null) {
-			tileSprites[y, x].renderer.enabled = true;
+		// create an empty map if it does not already exist
+		if (map == null) {
+			map = new int[32, 32];
+			tileSprites = new GameObject[32, 32];
 		}
 
-		if (tilecode >= (AtlasWidth() * AtlasHeight())) {
-			throw new System.IndexOutOfRangeException("Tile code index is out of range of tile atlas.");
-		}
-	
-		// SINGLETON
-		// if a sprite exists for this tile already, replace it with a new tile sprite
-		if (tileSprites[y, x] != null) {
-			((SpriteRenderer)tileSprites[y, x].renderer).sprite = Sprite.Create(atlas, getTileRect(tilecode), Vector2.zero);
-			return tileSprites[y, x];
+		// check target against map dimensions
+		if (x > -1 && x < map.GetLength (1) &&
+			y > -1 && y < map.GetLength (0)) {
+			if (tilecode == -1) 
+			{
+				// disable this tile
+				tileSprites[y, x].renderer.enabled = false;
+				return tileSprites[y, x];
+			} else if (tileSprites[y, x] != null) {
+				tileSprites[y, x].renderer.enabled = true;
+			}
+			
+			if (tilecode >= (AtlasWidth() * AtlasHeight())) {
+				throw new System.IndexOutOfRangeException("Tile code index is out of range of tile atlas.");
+			}
+			
+			// SINGLETON
+			// if a sprite exists for this tile already, replace it with a new tile sprite
+			if (tileSprites[y, x] != null) {
+				((SpriteRenderer)tileSprites[y, x].renderer).sprite = Sprite.Create(atlas, getTileRect(tilecode), Vector2.zero);
+				return tileSprites[y, x];
+			}
+			
+			// create a new sprite if one does not exist already
+			if (tileSprites[y, x] == null) {
+				GameObject go = new GameObject("Tile: " + tilecode, typeof(SpriteRenderer));
+				((SpriteRenderer)(go.renderer)).sprite = 
+					Sprite.Create(atlas, getTileRect(tilecode), Vector2.zero);
+				go.transform.Translate ((x / 100f) * tileWidth, (y / 100f) * tileHeight, 0f);
+				
+				tileSprites[y, x] = go;
+				return tileSprites[y, x];
+			}
 		}
 
-    	// create a new sprite if one does not exist already
-		if (tileSprites[y, x] == null) {
-			GameObject go = new GameObject("Tile: " + tilecode, typeof(SpriteRenderer));
-			((SpriteRenderer)(go.renderer)).sprite = 
-				Sprite.Create(atlas, getTileRect(tilecode), Vector2.zero);
-			go.transform.Translate ((x / 100f) * 32, (y / 100f) * 32, 0f);
-
-			tileSprites[y, x] = go;
-			return tileSprites[y, x];
-		}
-
-		// TODO: shouldn't get here yet
+		// the tile cannot be drawn outside of the tilemap array
 		return null;
     }
 
@@ -169,6 +178,7 @@ public class TileMap : MonoBehaviour {
 		}
 
 	}
+
 
 
 	// TODO: scall small text up on smaller screens
