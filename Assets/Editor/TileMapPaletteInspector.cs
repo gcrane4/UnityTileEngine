@@ -72,15 +72,13 @@ public class TileMapPaletteInspector : Editor {
 					GUILayout.Label ("Divide into " + numTiles + " tiles?");
 				}
 				
-				if (GUILayout.Button ("Apply")) {
+				if (GUILayout.Button ("Apply") || texList == null) {
 					// cleanup unused textures
 					if (texList != null) {
 						foreach (Texture2D tex in texList) 
 						{
 							DestroyImmediate(tex);
 						}
-						
-						texList = null;
 					}
 					
 					// destroy focused background texture if it exists
@@ -121,13 +119,14 @@ public class TileMapPaletteInspector : Editor {
 				GUILayout.EndHorizontal ();
 			}			
 
-			// calculate rowlength based on tilemap object
-			int rowLength = (targetTilemap.atlas.width / targetTilemap.tileWidth);
+			if (texList != null) {
+			    int rowLength = (targetTilemap.atlas.width / targetTilemap.tileWidth);
 
-			if (texList != null && rowLength > 0) {
-				scrollPos = GUILayout.BeginScrollView (scrollPos, blankStyle);
-				selected = GUILayout.SelectionGrid (selected, texList, rowLength, buttonStyle);
-				GUILayout.EndScrollView ();
+				if (rowLength > 0) {
+					scrollPos = GUILayout.BeginScrollView (scrollPos, blankStyle);
+					selected = GUILayout.SelectionGrid (selected, texList, rowLength, buttonStyle);
+					GUILayout.EndScrollView ();
+				}
 			}
 		}
 
