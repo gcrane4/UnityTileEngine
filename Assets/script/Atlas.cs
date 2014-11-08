@@ -12,6 +12,8 @@ public class Atlas : MonoBehaviour {
 
 	// INTERNAL VARIABLES
 	private Texture2D[] texList;
+	[SerializeField]
+	private bool texListGenerated;
 	public int selected;
 
 	// INTERNAL CLASS METHODS
@@ -35,23 +37,38 @@ public class Atlas : MonoBehaviour {
 	}
 
 	// CLASS DATA ACCESSORS
-	public int RowLength {
+	/** returns the number of columns of tiles in the atlas */
+	public int Columns {
 		get {
-			return atlasTex.width / tileWidth;
+			if (tileWidth > 0)
+				return atlasTex.width / tileWidth;
+			return 0;
+		}
+	}
+	
+	/** returns the number of rows of tiles in the atlas */
+	public int Rows {
+		get {
+			if (tileHeight > 0)
+				return atlasTex.height / tileHeight;
+			return 0;
 		}
 	}
 
-	public int ColLength {
-		get {
-			return atlasTex.height / tileHeight;
-		}
-	}
-
+	/** returns the last tile index */
 	public int LastTile {
 		get {
-			return (RowLength * ColLength) - 1;
+			return (Columns * Rows) - 1;
 		}
 	}
+
+	/** returns the state of division of the atlas */
+	public bool TexListGenerated {
+		get {
+			return texListGenerated;
+		}
+	}
+
 
 	public Rect getTileRect(int x, int y) 
 	{
@@ -64,8 +81,8 @@ public class Atlas : MonoBehaviour {
 		/** check for sane values before pulling tile */
 		if (CheckRequirements()) {
 			/** check requested x and y values against atlas range */
-			if (x < 0 || x > RowLength ||
-			    y < 0 || y > ColLength)
+			if (x < 0 || x > Columns ||
+			    y < 0 || y > Rows)
 				throw new UnityException("Tile requested is outside of bounds of sprite atlas.");
 
 			// create sprite from sprite atlas texture and tile coordiantes
@@ -76,16 +93,25 @@ public class Atlas : MonoBehaviour {
 	}
 
 	public Sprite GetTile(int tilecode) {
-		int x = tilecode % RowLength;
-		int y = tilecode / RowLength;
+		int x = tilecode % Columns;
+		int y = tilecode / Columns;
 
 		return GetTile (x, y);
 	}
 
-	void DivideTiles ()
+	public void DivideTiles ()
 	{
+		// update the texture list generated flag
+		texListGenerated = true;
+
+		// if a dimension is missing, do not divide
+		if (Columns < 1 || Rows < 1) {
+			texList = null;
+			return;
+		}
+
 		// if new list textures are required, recalculate all tiles
-		texList = new Texture2D[RowLength * ColLength];
+		texList = new Texture2D[Columns * Rows];
 		int k = 0;
 		for (int j = atlasTex.height - tileHeight; j > -1; j -= tileHeight) {
 			for (int i = 0; i < atlasTex.width; i += tileWidth) {
@@ -99,25 +125,9 @@ public class Atlas : MonoBehaviour {
 		}
 	}
 
-	public Texture2D[] GetTexList() {
-		if (CheckRequirements ()) {
-			// if there is an existing texture list with at least one tile
-			if (texList != null) {
-				// check the new parameters against old texture list data
-				if (texList.Length != (atlasTex.width / tileWidth) * (atlasTex.height / tileHeight) ||
-				    texList[0].width != tileWidth ||
-				    texList[0].height != tileHeight) {
-						// generate new tile list as parameters change
-						DivideTiles ();
-					}
-				}
-			}
-
-			// attempt to generate a new list if it hasn't been already
-			if (texList == null) {
-				DivideTiles ();
-			}
-
-		return texList;
+	public Texture2D[] TexList {
+		get {
+			return texList;
+		}
 	}
 }

@@ -9,7 +9,6 @@ public class AtlasInspector : Editor {
 	int tileWidth;
 	int tileHeight;
 
-	private bool divisionApplied;
 	private Texture2D[] texList;
 
 	Color[] lastTile;
@@ -23,10 +22,6 @@ public class AtlasInspector : Editor {
 		// get tilemap as target object
 		var targetAtlas = target as Atlas;
 
-		// before any user input, clean the GUI dirty flag
-		GUI.changed = false;
-
-		GUILayout.Label ("Base Settings", EditorStyles.boldLabel);
 		targetAtlas.atlasTex = (Texture2D)EditorGUILayout.ObjectField ("Atlas Texture", targetAtlas.atlasTex, typeof(Texture2D), false);
 		
 		GUILayout.BeginHorizontal ();
@@ -66,51 +61,58 @@ public class AtlasInspector : Editor {
 				int numTiles = numTilesX * numTilesY;
 				
 				GUILayout.BeginHorizontal ();
+
+				// show warning if dividing into many tiles
 				if (numTiles > 4096) {
-					GUILayout.Label ("Divide into " + numTiles + " tiles?", warningStyle);
-				}
-				
-				if (numTiles <= 4096) {
-					GUILayout.Label ("Divide into " + numTiles + " tiles?");
+					GUILayout.Label ("Divide into " + (targetAtlas.LastTile + 1) + " tiles?", warningStyle);
 				}
 
-				// once the apply button is clicked, or if it has been before already
+				// consider 4096 "a few" tiles
+				if (numTiles <= 4096) {
+					GUILayout.Label ("Divide into " + (targetAtlas.LastTile + 1) + " tiles?");
+				}
+
+				// apply sprite atlas texture division once the apply button is pressed
 				if (GUILayout.Button ("Apply")) {
-					// update the division applied flag
-					divisionApplied = true;
+					// apply division to tile sprite atlas
+					targetAtlas.DivideTiles();
 
 					// destroy focused background texture if it exists
 					if (buttonStyle.onNormal.background != null) {
 						DestroyImmediate(buttonStyle.onNormal.background); 
 					}
 
-					// reset focused background size
+					// reset focused background size and texture
 					buttonStyle.onNormal.background = 
 						new Texture2D(targetAtlas.tileWidth, targetAtlas.tileHeight);
 					Color[] backColors = new Color[targetAtlas.tileWidth * targetAtlas.tileHeight];
 					for (int i = 0; i < backColors.Length; i++) {
 						backColors[i] = Color.black;
-					}
-					
+					}					
 					buttonStyle.onNormal.background.SetPixels(backColors);
 					buttonStyle.onNormal.background.hideFlags = HideFlags.DontSave;
 					buttonStyle.onNormal.background.Apply();
 				}
 				GUILayout.EndHorizontal ();
-			}		    
-
-			// render the texture list once and only after division is applied
-			if (divisionApplied) {
-				// update the division applied flag
-				divisionApplied = false;
-				texList = targetAtlas.GetTexList();
 			}
 
-			if (texList != null) {
-				int rowLength = targetAtlas.RowLength;
-				if (texList.Length > 0) {
+			// generate the texture list with saved data if available
+			if (targetAtlas.TexListGenerated && targetAtlas.TexList == null) {
+				targetAtlas.DivideTiles();
+			}
+
+			// if there is a valid atlas texture list
+			if (targetAtlas.TexList != null) {
+				// populate local texture list as needed
+				if (texList == null) {
+					texList = targetAtlas.TexList;
+				}
+
+				// use local copy to improve performance
+				int rowLength = targetAtlas.Columns;
+				if (rowLength > 0) {
 					scrollPos = GUILayout.BeginScrollView (scrollPos, blankStyle);
-					targetAtlas.selected = GUILayout.SelectionGrid (targetAtlas.selected, texList, rowLength, buttonStyle);
+					targetAtlas.selected = GUILayout.SelectionGrid (targetAtlas.selected, targetAtlas.TexList, rowLength, buttonStyle);
 					GUILayout.EndScrollView ();
 				}
 			}

@@ -20,8 +20,8 @@ public class TileMap : MonoBehaviour {
 
 	public Rect getTileRect(int tilecode) 
 	{
-		return new Rect ((tilecode % atlas.RowLength) * atlas.tileWidth, 
-		                 ((atlas.ColLength - (tilecode / atlas.RowLength)) * atlas.tileHeight) - atlas.tileHeight, 
+		return new Rect ((tilecode % atlas.Columns) * atlas.tileWidth, 
+		                 ((atlas.Rows - (tilecode / atlas.Columns)) * atlas.tileHeight) - atlas.tileHeight, 
 		                 atlas.tileWidth, atlas.tileHeight);
 	}
 
