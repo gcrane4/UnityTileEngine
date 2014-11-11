@@ -73,7 +73,9 @@ public class AtlasInspector : Editor {
 				}
 
 				// apply sprite atlas texture division once the apply button is pressed
-				if (GUILayout.Button ("Apply")) {
+				// or if there is already a saved division
+				if (GUILayout.Button ("Apply") ||
+				    (targetAtlas.TexListGenerated && targetAtlas.TexList == null)) {
 					// apply division to tile sprite atlas
 					targetAtlas.DivideTiles();
 
@@ -94,11 +96,6 @@ public class AtlasInspector : Editor {
 					buttonStyle.onNormal.background.Apply();
 				}
 				GUILayout.EndHorizontal ();
-			}
-
-			// generate the texture list with saved data if available
-			if (targetAtlas.TexListGenerated && targetAtlas.TexList == null) {
-				targetAtlas.DivideTiles();
 			}
 
 			// if there is a valid atlas texture list

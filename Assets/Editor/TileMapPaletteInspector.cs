@@ -14,23 +14,25 @@ public class TileMapPaletteInspector : Editor {
 			if (Event.current.GetTypeForControl(controlID) == EventType.MouseDown) {
 				GUIUtility.hotControl = controlID;
 
-				// manipulate current event's mouse position in world
+				// manipulate current event's mouse position on screen
 				Vector2 mousePosition = Event.current.mousePosition;
+
+				// flip y-axis mouse position information
+				mousePosition.y = SceneView.currentDrawingSceneView.camera.pixelHeight - mousePosition.y;
 
 				// translate screen click to world point
 				Vector2 worldPoint = SceneView.currentDrawingSceneView.camera.ScreenToWorldPoint(mousePosition);
 
-				// get the camera position for offset
-				Vector2 cameraPosition = SceneView.currentDrawingSceneView.camera.transform.position;
-
-				// shift the mouse click point using camera position
-				Vector2 shiftPoint = new Vector3(worldPoint.x,
-                	-(worldPoint.y - (2 * cameraPosition.y)));
+				// shift world point using tilemap transform position
+				worldPoint.x -= targetTilemap.transform.position.x;
+				worldPoint.y -= targetTilemap.transform.position.y;
 
 				// get x and y in tiles
 				Atlas atlas = targetTilemap.GetComponent<Atlas>();
-				int tileX = (int)((shiftPoint.x * 100) / atlas.tileWidth);
-				int tileY = (int)((shiftPoint.y * 100) / atlas.tileHeight);
+				int tileX = Mathf.FloorToInt((worldPoint.x * 100) / atlas.tileWidth);
+				int tileY = Mathf.FloorToInt((worldPoint.y * 100) / atlas.tileHeight);
+
+				Debug.Log("Tile: " + tileX + ", " + tileY);
 
 				// use TileMap method to draw tile to TileMap
 				if (targetTilemap.DrawTile(tileX, tileY, atlas.selected) == null) {
