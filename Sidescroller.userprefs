@@ -1,12 +1,13 @@
 ﻿<Properties>
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\script\TileMap.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\script\TileMapLoader.cs">
     <Files>
-      <File FileName="Assets\script\TileMap.cs" Line="90" Column="3" />
-      <File FileName="Assets\Editor\TileMapPaletteInspector.cs" Line="1" Column="1" />
+      <File FileName="Assets\Editor\TileMapInspector.cs" Line="6" Column="41" />
+      <File FileName="Assets\script\TileMap.cs" Line="16" Column="2" />
       <File FileName="Assets\Editor\AtlasInspector.cs" Line="1" Column="1" />
       <File FileName="Assets\script\CameraTouchInput.cs" Line="1" Column="1" />
       <File FileName="Assets\script\Atlas.cs" Line="1" Column="1" />
+      <File FileName="Assets\script\TileMapLoader.cs" Line="14" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

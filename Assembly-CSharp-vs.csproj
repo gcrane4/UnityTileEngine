@@ -50,6 +50,7 @@
      <Compile Include="Assets\script\AutoTileMap.cs" />
      <Compile Include="Assets\script\CameraTouchInput.cs" />
      <Compile Include="Assets\script\TileMap.cs" />
+     <Compile Include="Assets\script\TileMapLoader.cs" />
      <Compile Include="Assets\script\TileQuad.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
