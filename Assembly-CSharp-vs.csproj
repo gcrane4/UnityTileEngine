@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{3066269A-BF52-5438-AE09-5C49F4AEF781}</ProjectGuid>
+	<ProjectGuid>{51AC9DDB-092A-AC1E-E218-AB4B2427371E}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -49,7 +49,10 @@
      <Compile Include="Assets\script\Atlas.cs" />
      <Compile Include="Assets\script\AutoTileMap.cs" />
      <Compile Include="Assets\script\CameraTouchInput.cs" />
+     <Compile Include="Assets\script\ClickHandler.cs" />
      <Compile Include="Assets\script\TileMap.cs" />
+     <Compile Include="Assets\script\TileMapLoader.cs" />
+     <Compile Include="Assets\script\TileMapPalette.cs" />
      <Compile Include="Assets\script\TileQuad.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>

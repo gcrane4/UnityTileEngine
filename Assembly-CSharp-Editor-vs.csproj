@@ -5,7 +5,7 @@
 	<Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
 	<ProductVersion>10.0.20506</ProductVersion>
 	<SchemaVersion>2.0</SchemaVersion>
-	<ProjectGuid>{7E15CC0A-61D3-CA16-CBC4-72D649F91BCC}</ProjectGuid>
+	<ProjectGuid>{DAD50F9E-D367-1058-ACD8-FE95BD72DB57}</ProjectGuid>
 	<OutputType>Library</OutputType>
 	<AppDesignerFolder>Properties</AppDesignerFolder>
 	<RootNamespace></RootNamespace>
@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\Editor\AtlasInspector.cs" />
+     <Compile Include="Assets\Editor\TileMapInspector.cs" />
      <Compile Include="Assets\Editor\TileMapPaletteInspector.cs" />
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files (x86)/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/4.6.0/UnityEngine.UI.dll</HintPath>
@@ -60,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-vs.csproj">
-      <Project>{3066269A-BF52-5438-AE09-5C49F4AEF781}</Project>      <Name>Assembly-CSharp-vs</Name>    </ProjectReference>
+      <Project>{51AC9DDB-092A-AC1E-E218-AB4B2427371E}</Project>      <Name>Assembly-CSharp-vs</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

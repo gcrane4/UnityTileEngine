@@ -122,4 +122,33 @@ public class TileMap : MonoBehaviour
 		// return the current map data
 		return tileObjects[y, x];
 	}
+
+	void OnDrawGizmosSelected() {
+		// check that a valid map area is specified
+		// and that an atlas is selected
+		if (mapWidth > 0 && mapHeight > 0 && atlas != null &&
+		    atlas.tileWidth > 1 && atlas.tileHeight > 1) {
+			// set gizmo line color
+			Gizmos.color = Color.blue;
+		
+			// get scale in units
+			float shiftX = ((mapWidth * atlas.tileWidth) / 100f);
+			float shiftY = ((mapHeight * atlas.tileHeight) / 100f);
+
+			// get the corners for point positions
+			Vector2 topLeft = new Vector2(transform.position.x, transform.position.y + shiftY);
+			Vector2 topRight = new Vector2(transform.position.x + shiftX, transform.position.y + shiftY);
+			Vector2 bottomLeft = transform.position;
+			Vector2 bottomRight = new Vector2(transform.position.x + shiftX, transform.position.y);
+
+			// draw the top line
+			Gizmos.DrawLine (topLeft, topRight);
+			// draw the right line
+			Gizmos.DrawLine (topRight, bottomRight);
+			// draw the bottom line
+			Gizmos.DrawLine (bottomRight, bottomLeft);
+			// draw the left line
+			Gizmos.DrawLine (bottomLeft, topLeft);
+		}
+	}
 }
