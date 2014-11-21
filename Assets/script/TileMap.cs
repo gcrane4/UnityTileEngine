@@ -7,8 +7,6 @@ using System.IO;
 [RequireComponent (typeof(Atlas))]
 public class TileMap : MonoBehaviour
 {
-	/** a two-dimensional array of integers representing tilecodes at each map tile */
-	private int[,] map;
 	private GameObject[,] tileObjects;
 	private Sprite[,] sprites;
 	private Atlas atlas;
@@ -60,30 +58,31 @@ public class TileMap : MonoBehaviour
 			atlas = this.GetComponent<Atlas> ();
 		}
 
-		// create an empty map if it does not already exist
-		if (map == null) {
-			map = new int[mapHeight, mapWidth];
+		// create a map of GameObjects
+		if (tileObjects == null) {
 			tileObjects = new GameObject[mapHeight, mapWidth];
+		}
+
+		// create a map of Sprites
+		if (sprites == null) {
 			sprites = new Sprite[mapHeight, mapWidth];
 		}
 
-		if (mapWidth > map.GetLength (1) || mapHeight > map.GetLength (0)) {
+		if (mapWidth > tileObjects.GetLength (1) || mapHeight > tileObjects.GetLength (0)) {
 			// create a new map that is larger than the original
 			int[,] newMap = new int[mapHeight, mapWidth];
 			GameObject[,] newTO = new GameObject[mapHeight, mapWidth];
 			Sprite[,] newSprites = new Sprite[mapHeight, mapWidth];
 
 			// copy old map data to new map
-			for (int j = 0; j < map.GetLength(0); j++) {
-				for (int i = 0; i < map.GetLength(1); i++) {
-					newMap [j, i] = map [j, i];
+			for (int j = 0; j < tileObjects.GetLength(0); j++) {
+				for (int i = 0; i < tileObjects.GetLength(1); i++) {
 					newTO [j, i] = tileObjects [j, i];
 					newSprites [j, i] = sprites [j, i];
 				}
 			}
 
-				// replace old map with new map by reference
-			map = newMap;
+			// replace old map with new map by reference
 			tileObjects = newTO;
 			sprites = newSprites;
 		}
